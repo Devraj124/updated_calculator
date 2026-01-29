@@ -1,0 +1,4 @@
+Flask
+gunicorn
+# Excel automation (Windows-only; Render runs on Linux)
+pywin32; platform_system == "Windows"

@@ -1,12 +1,30 @@
 from flask import Flask, render_template, request
-import win32com.client
-import pythoncom
+import platform
 import os
 import time
 import threading
 import queue
 import atexit
-import pywintypes
+
+# Excel COM automation is Windows-only (pywin32).
+try:
+    import win32com.client  # type: ignore
+    import pythoncom  # type: ignore
+    import pywintypes  # type: ignore
+
+    _PYWIN32_AVAILABLE = True
+except Exception:  # pragma: no cover
+    win32com = None  # type: ignore
+    pythoncom = None  # type: ignore
+
+    class _DummyComError(Exception):
+        pass
+
+    class _DummyPyWinTypes:
+        com_error = _DummyComError
+
+    pywintypes = _DummyPyWinTypes()  # type: ignore
+    _PYWIN32_AVAILABLE = False
 
 app = Flask(__name__)
 
@@ -49,6 +67,10 @@ def get_maintenance_message() -> str | None:
             return DEFAULT_MAINTENANCE_MESSAGE
     except Exception:
         pass
+
+    # Render runs on Linux; Excel COM won't work there.
+    if platform.system() != "Windows" or not _PYWIN32_AVAILABLE:
+        return DEFAULT_MAINTENANCE_MESSAGE
 
     return None
 
