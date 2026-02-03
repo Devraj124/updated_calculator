@@ -115,39 +115,59 @@ def _convert_xlsb_to_xlsx(xlsb_path: str) -> str:
         xlsx_path = os.path.join(temp_dir, f"calculator_{os.path.basename(xlsb_path)}.xlsx")
         
         try:
-            # Read xlsb using pyxlsb and write to xlsx using openpyxl
-            if _PYXLSB_AVAILABLE:
-                wb_xlsb = pyxlsb.open_workbook(xlsb_path)
-                wb_xlsx = openpyxl.Workbook()
+            # Method 1: Try pandas first (more reliable for .xlsb files)
+            # This preserves data structure better and handles edge cases
+            try:
+                if _PYXLSB_AVAILABLE:
+                    df_dict = pd.read_excel(xlsb_path, sheet_name=None, engine='pyxlsb')
+                else:
+                    df_dict = pd.read_excel(xlsb_path, sheet_name=None)
                 
-                # Copy all sheets
-                for sheet_name in wb_xlsb.sheets:
-                    ws_xlsb = wb_xlsb.get_sheet(sheet_name)
-                    ws_xlsx = wb_xlsx.create_sheet(title=sheet_name)
-                    
-                    # Copy cells
-                    for row in ws_xlsb.rows():
-                        for cell in row:
-                            if cell.v is not None:
-                                ws_xlsx.cell(row=cell.r, column=cell.c, value=cell.v)
-                            # Note: formulas are lost in this conversion, but we'll handle that differently
+                with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer:
+                    for sheet_name, df in df_dict.items():
+                        df.to_excel(writer, sheet_name=sheet_name, index=False)
                 
-                # Remove default sheet if we created new ones
-                if len(wb_xlsx.sheetnames) > 1 and 'Sheet' in wb_xlsx.sheetnames:
-                    wb_xlsx.remove(wb_xlsx['Sheet'])
+                _xlsx_cache_file = xlsx_path
+                return xlsx_path
+            except Exception as pandas_error:
+                # If pandas method fails, try direct pyxlsb method
+                if not _PYXLSB_AVAILABLE:
+                    raise Exception(f"Cannot convert .xlsb file. pyxlsb not available. Pandas error: {str(pandas_error)}")
                 
-                wb_xlsx.save(xlsx_path)
-                wb_xlsx.close()
-            else:
-                # Fallback: try to use pandas to read and write
-                # This won't preserve formulas but will preserve data
+                # Method 2: Direct pyxlsb to openpyxl conversion (fallback)
                 try:
-                    df_dict = pd.read_excel(xlsb_path, sheet_name=None, engine='pyxlsb' if _PYXLSB_AVAILABLE else None)
-                    with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer:
-                        for sheet_name, df in df_dict.items():
-                            df.to_excel(writer, sheet_name=sheet_name, index=False)
-                except Exception:
-                    raise Exception("Cannot convert .xlsb file. Please install pyxlsb: pip install pyxlsb")
+                    wb_xlsb = pyxlsb.open_workbook(xlsb_path)
+                    wb_xlsx = openpyxl.Workbook()
+                    
+                    # Copy all sheets
+                    for sheet_name in wb_xlsb.sheets:
+                        ws_xlsb = wb_xlsb.get_sheet(sheet_name)
+                        ws_xlsx = wb_xlsx.create_sheet(title=sheet_name)
+                        
+                        # Copy cells with validation
+                        for row in ws_xlsb.rows():
+                            for cell in row:
+                                # Validate row and column indices (must be >= 1 for openpyxl)
+                                if cell.r >= 1 and cell.c >= 1 and cell.v is not None:
+                                    try:
+                                        ws_xlsx.cell(row=cell.r, column=cell.c, value=cell.v)
+                                    except (ValueError, TypeError) as e:
+                                        # Skip invalid cells and log warning
+                                        try:
+                                            app.logger.warning(f"Skipping invalid cell at row={cell.r}, col={cell.c}: {str(e)}")
+                                        except Exception:
+                                            pass
+                        # Note: formulas are lost in this conversion, but we'll handle that differently
+                    
+                    # Remove default sheet if we created new ones
+                    if len(wb_xlsx.sheetnames) > 1 and 'Sheet' in wb_xlsx.sheetnames:
+                        wb_xlsx.remove(wb_xlsx['Sheet'])
+                    
+                    wb_xlsx.save(xlsx_path)
+                    wb_xlsx.close()
+                    wb_xlsb.close()
+                except Exception as pyxlsb_error:
+                    raise Exception(f"Error converting .xlsb to .xlsx. Pandas method failed: {str(pandas_error)}. Pyxlsb method failed: {str(pyxlsb_error)}")
             
             _xlsx_cache_file = xlsx_path
             return xlsx_path
