@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incentive Calculator</title>
     <style>
+        :root {
+            --bg0: #0b1020;
+            --bg1: #0f1a3a;
+            --surface: rgba(255, 255, 255, 0.92);
+            --surface-solid: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: rgba(15, 23, 42, 0.10);
+            --border-strong: rgba(15, 23, 42, 0.16);
+            --shadow: 0 12px 30px rgba(2, 6, 23, 0.12);
+            --shadow-sm: 0 6px 16px rgba(2, 6, 23, 0.10);
+            --accent: #ff9800;
+            --accent-2: #2563eb;
+            --danger: #dc3545;
+            --ok: #16a34a;
+            --radius: 14px;
+            --radius-sm: 10px;
+            --pad: 22px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,29 +33,43 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f5f5f5;
-            padding: 20px;
-            color: #333;
+            color: var(--text);
+            padding: 28px 18px 40px;
+            background:
+                radial-gradient(1100px 520px at 15% 0%, rgba(37, 99, 235, 0.35) 0%, rgba(37, 99, 235, 0.00) 65%),
+                radial-gradient(900px 520px at 90% 15%, rgba(255, 152, 0, 0.35) 0%, rgba(255, 152, 0, 0.00) 60%),
+                linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 100%);
+            min-height: 100vh;
+            -webkit-text-size-adjust: 100%;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1150px;
             margin: 0 auto;
         }
 
         .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            box-shadow: var(--shadow);
+            padding: 28px;
             margin-bottom: 20px;
+            backdrop-filter: blur(10px);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 30px;
-            color: #333;
+            margin-bottom: 10px;
+            color: var(--text);
             font-size: 28px;
+            letter-spacing: 0.2px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 18px 0;
         }
 
         .input-section {
@@ -43,6 +77,12 @@
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-bottom: 30px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
         .input-group {
@@ -53,33 +93,51 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #333;
+            color: var(--text);
             font-size: 14px;
+            text-align: left;
         }
 
-        .input-group input {
+        .input-group input,
+        .table-select,
+        .table-input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid var(--border-strong);
+            border-radius: 10px;
             font-size: 14px;
-            background-color: #fff;
+            background-color: var(--surface-solid);
+            color: var(--text);
+            outline: none;
+            transition: box-shadow 120ms ease, border-color 120ms ease;
         }
 
         .input-group input:disabled {
-            background-color: #f5f5f5;
+            background-color: rgba(2, 6, 23, 0.04);
             color: #666;
+        }
+
+        .input-group input:focus,
+        .table-select:focus,
+        .table-input:focus {
+            border-color: rgba(37, 99, 235, 0.55);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
         }
 
         .ratio-mix-group {
             margin-top: 20px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.70);
         }
 
         .ratio-mix-group h3 {
             font-size: 16px;
             margin-bottom: 15px;
-            color: #333;
+            color: var(--text);
             font-weight: 600;
+            text-align: left;
         }
 
         .ratio-input {
@@ -89,11 +147,11 @@
         .total-display {
             margin-top: 10px;
             font-size: 14px;
-            color: #333;
+            color: var(--text);
         }
 
         .total-display .valid {
-            color: #28a745;
+            color: var(--ok);
             font-weight: 600;
         }
 
@@ -102,28 +160,33 @@
             width: 200px;
             margin: 30px auto;
             padding: 12px 30px;
-            background-color: #ff9800;
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.95), rgba(255, 152, 0, 0.80));
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            box-shadow: var(--shadow-sm);
+            transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
         }
 
         .calculate-btn:hover {
-            background-color: #f57c00;
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(2, 6, 23, 0.18);
         }
 
         .calculate-btn:disabled {
             background-color: #ccc;
             cursor: not-allowed;
             opacity: 0.6;
+            box-shadow: none;
         }
 
         .calculate-btn:disabled:hover {
             background-color: #ccc;
+            transform: none;
+            box-shadow: none;
         }
 
         .results-section {
@@ -164,14 +227,15 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
-            color: #333;
+            color: var(--muted);
             font-size: 14px;
+            text-align: left;
         }
 
         .result-group .value {
             font-size: 18px;
             font-weight: 600;
-            color: #333;
+            color: var(--text);
         }
 
         .result-group .percentage {
@@ -181,6 +245,38 @@
             color: #666;
         }
 
+        /* Highlight output boxes (borders + subtle accent) */
+        .results-section .result-group {
+            padding: 14px 14px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.80);
+        }
+
+        .results-section .result-group .value {
+            border: 1px solid rgba(15, 23, 42, 0.10);
+            background: rgba(2, 6, 23, 0.02);
+            border-radius: 10px;
+            padding: 10px 10px;
+        }
+
+        /* Stronger highlight specifically for values fetched from Excel */
+        .excel-value {
+            border: 1px solid rgba(37, 99, 235, 0.40) !important;
+            background: rgba(37, 99, 235, 0.08) !important;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+        }
+
+        /* Highlight Excel-computed columns inside tables */
+        .excel-cell {
+            border: 1px solid rgba(37, 99, 235, 0.22);
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: inline-block;
+            min-width: 70px;
+        }
+
         .product-mix-section {
             margin-top: 40px;
         }
@@ -188,26 +284,46 @@
         .product-mix-section h2 {
             font-size: 24px;
             margin-bottom: 20px;
-            color: #333;
+            color: var(--text);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-bottom: 20px;
+            background: var(--surface-solid);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        /* Generic horizontal scroll container for wide tables on mobile */
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll table {
+            margin-bottom: 0;
         }
 
         thead th {
-            background-color: #fff;
+            background: linear-gradient(180deg, rgba(37, 99, 235, 0.10), rgba(37, 99, 235, 0.04));
             font-weight: 600;
             padding: 12px;
-            text-align: left;
-            color: #333;
+            text-align: center;
+            color: var(--text);
             font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid rgba(15, 23, 42, 0.06);
         }
 
         thead th:not(:first-child) {
-            text-align: right;
+            text-align: left;
         }
 
         tbody tr {
@@ -215,81 +331,246 @@
         }
 
         tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: rgba(2, 6, 23, 0.02);
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 152, 0, 0.06);
         }
 
         tbody td {
             padding: 12px;
             font-size: 14px;
-            color: #333;
+            color: var(--text);
+            border-top: 1px solid rgba(15, 23, 42, 0.06);
+            border-right: 1px solid rgba(15, 23, 42, 0.06);
         }
 
         tbody td:not(:first-child) {
+            text-align: left;
+        }
+
+        thead th:last-child,
+        tbody td:last-child {
+            border-right: none;
+        }
+
+        /* Numeric alignment for the summary tables */
+        .product-mix-table thead th:not(:first-child),
+        .product-mix-table tbody td:not(:first-child),
+        .recommended-products-table thead th:not(:first-child),
+        .recommended-products-table tbody td:not(:first-child) {
             text-align: right;
+        }
+
+        /* Individual Product Mix table alignment */
+        .individual-product-table thead th,
+        .individual-product-table tbody td {
+            text-align: left;
+        }
+
+        .individual-product-table thead th {
+            text-align: center;
+        }
+
+        /* Center Y/N selects */
+        .individual-product-table thead th:nth-child(4),
+        .individual-product-table thead th:nth-child(5),
+        .individual-product-table tbody td:nth-child(4),
+        .individual-product-table tbody td:nth-child(5) {
+            text-align: center;
+        }
+
+        /* Right align numeric inputs + computed columns */
+        .individual-product-table thead th:nth-child(n+6),
+        .individual-product-table tbody td:nth-child(n+6) {
+            text-align: right;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.80);
+        }
+
+        .individual-product-table {
+            min-width: 1060px;
+            table-layout: fixed;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+
+        .individual-product-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        /* Column sizing to improve readability (reduce Cashback width) */
+        .individual-product-table th:nth-child(1),
+        .individual-product-table td:nth-child(1) { width: 56px; }
+        .individual-product-table th:nth-child(2),
+        .individual-product-table td:nth-child(2) { width: 240px; }
+        .individual-product-table th:nth-child(3),
+        .individual-product-table td:nth-child(3) { width: 170px; }
+        .individual-product-table th:nth-child(4),
+        .individual-product-table td:nth-child(4) { width: 90px; }
+        .individual-product-table th:nth-child(5),
+        .individual-product-table td:nth-child(5) { width: 78px; } /* Cashback (reduced) */
+        .individual-product-table th:nth-child(6),
+        .individual-product-table td:nth-child(6) { width: 90px; } /* PPT */
+        .individual-product-table th:nth-child(7),
+        .individual-product-table td:nth-child(7) { width: 90px; } /* PT */
+        .individual-product-table th:nth-child(8),
+        .individual-product-table td:nth-child(8) { width: 110px; } /* EPI */
+        .individual-product-table th:nth-child(9),
+        .individual-product-table td:nth-child(9) { width: 130px; } /* Rider */
+        .individual-product-table th:nth-child(10),
+        .individual-product-table td:nth-child(10) { width: 140px; }
+        .individual-product-table th:nth-child(11),
+        .individual-product-table td:nth-child(11) { width: 140px; }
+
+        .yn-select {
+            padding-left: 8px;
+            padding-right: 8px;
+            min-width: 64px;
+        }
+
+        /* Make PPT/PT inputs more readable */
+        .ppt-input,
+        .pt-input {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 10px;
+            text-align: right;
+        }
+
+        /* Slightly tighten Product Mix cards */
+        .product-mix-section {
+            margin-top: 28px;
         }
 
         .descriptive-text {
             margin: 25px 0;
             font-size: 14px;
-            color: #333;
+            color: var(--text);
             line-height: 1.6;
+            padding: 14px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        /* Make Hit 100% line stand out */
+        .hit-100 {
+            background: linear-gradient(180deg, rgba(22, 163, 74, 0.12), rgba(22, 163, 74, 0.06));
+            border-color: rgba(22, 163, 74, 0.28);
+            position: relative;
+            font-weight: 800;
+            font-size: 18px;
+            line-height: 1.75;
+            letter-spacing: 0.2px;
+        }
+
+        .hit-100::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            bottom: 10px;
+            width: 6px;
+            border-radius: 6px;
+            background: rgba(22, 163, 74, 0.75);
+        }
+
+        /* One-line banner under top Calculate button */
+        .sell-one-line {
+            margin: 12px 0 0;
+            width: 100%;
+            max-width: none;
+            padding: 14px 16px 14px 20px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255, 152, 0, 0.10), rgba(255, 152, 0, 0.05));
+            position: relative;
+            font-weight: 700;
+            color: var(--text);
+            box-shadow: 0 8px 18px rgba(2, 6, 23, 0.08);
+        }
+
+        .sell-one-line::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            bottom: 10px;
+            width: 6px;
+            border-radius: 6px;
+            background: rgba(255, 152, 0, 0.85);
+        }
+
+        .sell-one-line .label {
+            display: block;
+            text-align: center;
+            padding-left: 10px;
+            font-size: 20px;
+            line-height: 1.5;
         }
 
         .footnote {
             margin-top: 20px;
             font-size: 12px;
-            color: #999;
+            color: rgba(15, 23, 42, 0.60);
             font-style: italic;
-        }
-
-        .recommended-products-table thead th:nth-child(4) {
-            text-align: right;
-        }
-
-        .recommended-products-table tbody td:nth-child(4) {
-            text-align: right;
-        }
-
-        .table-select, .table-input {
-            width: 100%;
-            min-width: 80px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 13px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
         }
 
         .binder-achievement-table thead th {
-            background-color: #fff;
+            background: linear-gradient(180deg, rgba(255, 152, 0, 0.14), rgba(255, 152, 0, 0.06));
             font-weight: 600;
             padding: 12px;
             text-align: left;
-            color: #333;
+            color: var(--text);
             font-size: 14px;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid rgba(15, 23, 42, 0.06);
         }
 
         .binder-achievement-table tbody td {
             padding: 10px 12px;
             font-size: 13px;
-            color: #333;
+            color: var(--text);
             vertical-align: middle;
+            border-top: 1px solid rgba(15, 23, 42, 0.06);
+            border-right: 1px solid rgba(15, 23, 42, 0.06);
         }
 
         .add-more-btn {
             padding: 6px 10px;
             font-size: 12px;
-            border-radius: 4px;
-            border: 1px solid #ff9800;
-            background: #fff;
-            color: #ff9800;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 152, 0, 0.55);
+            background: rgba(255, 255, 255, 0.85);
+            color: #b45309;
             cursor: pointer;
             white-space: nowrap;
+            box-shadow: 0 6px 14px rgba(2, 6, 23, 0.08);
+            transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+        }
+
+        .add-more-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(2, 6, 23, 0.12);
         }
 
         .add-more-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .cell-flex {
@@ -310,25 +591,230 @@
         .product-row-error {
             margin-top: 10px;
             font-size: 12px;
-            color: #dc3545;
+            color: var(--danger);
             display: none;
         }
 
         .table-actions {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
             margin-top: 10px;
+        }
+
+        .table-actions .left-actions,
+        .table-actions .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calc-products-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(37, 99, 235, 0.45);
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 6px 14px rgba(2, 6, 23, 0.08);
+            transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+        }
+
+        .calc-products-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(2, 6, 23, 0.12);
+        }
+
+        .calc-products-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .alert {
+            border-radius: 12px;
+            padding: 14px 14px;
+            margin: 16px 0;
+            border: 1px solid var(--border);
+        }
+
+        .alert.notice {
+            background: rgba(255, 152, 0, 0.10);
+            border-color: rgba(255, 152, 0, 0.28);
+            color: #8a4b00;
+        }
+
+        .alert.error {
+            background: rgba(220, 53, 69, 0.10);
+            border-color: rgba(220, 53, 69, 0.25);
+            color: #8b1e2b;
+        }
+
+        /* Loading overlay (perceived speed + prevents double-submit spam) */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.40);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(6px);
+        }
+
+        .loading-card {
+            width: min(420px, calc(100% - 32px));
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 18px 18px;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            border: 3px solid rgba(37, 99, 235, 0.20);
+            border-top-color: rgba(37, 99, 235, 0.95);
+            animation: spin 900ms linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-title {
+            margin-top: 10px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .loading-subtitle {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .input-section {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            .result-row.row-1,
+            .result-row.row-2,
+            .result-row.row-3 {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .performance-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 18px 12px 26px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            h1 {
+                font-size: 22px;
+                line-height: 1.25;
+            }
+
+            /* Avoid iOS zoom-on-focus (16px+) */
+            .input-group input,
+            .table-select,
+            .table-input {
+                font-size: 16px;
+            }
+
+            .calculate-btn {
+                width: 100%;
+                max-width: none;
+                margin: 18px auto;
+            }
+
+            .sell-one-line .label {
+                font-size: 16px;
+            }
+
+            /* Stack table action buttons */
+            .table-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-actions .left-actions,
+            .table-actions .right-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .add-more-btn,
+            .calc-products-btn {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            /* Reduce sticky header weirdness on very small screens */
+            .individual-product-table {
+                min-width: 940px;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .calculate-btn,
+            .add-more-btn {
+                transition: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+            <div class="loading-card" role="status" aria-live="polite">
+                <div class="spinner" aria-hidden="true"></div>
+                <div class="loading-title">Calculating…</div>
+                <div class="loading-subtitle">
+                    This can take a few seconds while we calculate. Please don't refresh the page.
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <h1>Incentive Calculator</h1>
 
             {% if maintenance_message %}
-            <div style="background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 4px; padding: 15px; margin: 20px 0; color: #856404;">
-                <strong>Notice:</strong><br>
+            <div class="alert notice">
+                <strong>Notice</strong><br>
                 <div style="margin-top: 8px;">{{ maintenance_message }}</div>
             </div>
             {% else %}
@@ -336,9 +822,27 @@
                 <fieldset style="border: 0; padding: 0; margin: 0;">
                 <div class="input-section">
                     <div class="left-column">
-                        <div class="input-group">
-                            <label for="emp_id">Employee ID</label>
-                            <input type="text" id="emp_id" name="emp_id" value="{{ request.form.emp_id or '' }}">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="emp_id">Employee ID</label>
+                                <input type="text" id="emp_id" name="emp_id" value="{{ request.form.emp_id or '' }}">
+                            </div>
+                            <div class="input-group">
+                                <label for="doj">Date of Joining (DDMMYYYY)</label>
+                                <input
+                                    type="text"
+                                    id="doj"
+                                    name="doj"
+                                    inputmode="numeric"
+                                    autocomplete="off"
+                                    placeholder="DDMMYYYY"
+                                    pattern="[0-9]{8}"
+                                    minlength="8"
+                                    maxlength="8"
+                                    value="{{ request.form.doj or '' }}"
+                                    required
+                                >
+                            </div>
                         </div>
                         <div class="input-group">
                             <label for="desired_earning">Desired Earning</label>
@@ -352,7 +856,7 @@
 
                     <div class="right-column">
                         <div class="ratio-mix-group">
-                            <h3>Input Ratio Mix (must total 100%)</h3>
+                            <h3>Input Product mix you are planning to achieve (Ensure total is 100%)</h3>
                             <div class="ratio-input">
                                 <label for="non_par">Non Par (%)</label>
                                 <input type="number" id="non_par" name="non_par" value="{{ request.form.non_par or '' }}" step="0.1" min="0" max="100">
@@ -374,17 +878,23 @@
                 </div>
 
                 <button class="calculate-btn" id="calculateBtn" type="submit">Calculate</button>
+                {% if result and result.sell_one_line %}
+                <div class="sell-one-line" aria-label="Sell one line">
+                    <span class="label">{{ result.sell_one_line }}</span>
+                </div>
+                {% endif %}
                 </fieldset>
             </form>
 
             {% if error_message %}
-            <div style="background-color: #fee; border: 1px solid #fcc; border-radius: 4px; padding: 15px; margin: 20px 0; color: #c33;">
-                <strong>Error:</strong><br>
+            <div class="alert error">
+                <strong>Error</strong><br>
                 <pre style="white-space: pre-wrap; margin-top: 10px;">{{ error_message }}</pre>
             </div>
             {% endif %}
 
             {% if result %}
+            <div class="section-divider"></div>
             <div class="results-section">
                 <!-- Row 1: Emp ID, Emp name, Channel -->
                 <div class="result-row row-1">
@@ -394,11 +904,11 @@
                     </div>
                     <div class="result-group">
                         <label>Employee Name</label>
-                        <div class="value">{{ result.name }}</div>
+                        <div class="value excel-value">{{ result.name }}</div>
                     </div>
                     <div class="result-group">
                         <label>Channel</label>
-                        <div class="value">{{ result.channel }}</div>
+                        <div class="value excel-value">{{ result.channel }}</div>
                     </div>
                 </div>
 
@@ -406,21 +916,21 @@
                 <div class="result-row row-2">
                     <div class="result-group">
                         <label>Total Target</label>
-                        <div class="value">{{ result.total_target }}</div>
+                        <div class="value excel-value">{{ result.total_target }}</div>
                     </div>
                     <div class="result-group">
                         <label>Total Business Achievement</label>
-                        <div class="value">{{ result.total_biz }}</div>
+                        <div class="value excel-value">{{ result.total_biz }}</div>
                     </div>
                     <div class="result-group">
                         <label>Achievement</label>
-                        <div class="value">
+                        <div class="value excel-value">
                             <span id="resultPercentage">{{ result.achievement }}</span>
                         </div>
                     </div>
                     <div class="result-group">
                         <label>Deficit</label>
-                        <div class="value">{{ result.deficit }}</div>
+                        <div class="value excel-value">{{ result.deficit }}</div>
                     </div>
                 </div>
 
@@ -432,11 +942,11 @@
                     </div>
                     <div class="result-group">
                         <label>Current Incentive Earned</label>
-                        <div class="value">{{ result.incentive }}</div>
+                        <div class="value excel-value">{{ result.incentive }}</div>
                     </div>
                     <div class="result-group">
                         <label>Remaining Amount</label>
-                        <div class="value">{{ result.remaining_amount }}</div>
+                        <div class="value excel-value">{{ result.remaining_amount }}</div>
                     </div>
                 </div>
             </div>
@@ -448,59 +958,75 @@
         <div class="card product-mix-section">
             <h2>Product Mix</h2>
 
-            <table class="product-mix-table">
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Current Biz</th>
-                        <th>Current Product Mix</th>
-                        <th>Product Mix After Recommendation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in result.product_mix %}
-                    <tr>
-                        {% for cell in row %}
-                        <td>{{ cell }}</td>
+            <div class="table-scroll" aria-label="Product Mix table">
+                <table class="product-mix-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Current Biz</th>
+                            <th>Current Product Mix</th>
+                            <th>Product Mix After Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in result.product_mix %}
+                        <tr>
+                            {% for cell in row %}
+                            <td>
+                                {% if loop.index == 4 %}
+                                <span class="excel-cell">{{ cell }}</span>
+                                {% else %}
+                                {{ cell }}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
                         {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
 
-            <p class="descriptive-text">
+            <p class="descriptive-text hit-100">
                 {{ result.hit_100 }}
             </p>
 
-            <table class="recommended-products-table">
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Ratio</th>
-                        <th>Recommended Product</th>
-                        <th>Recommended Premium</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% set recommended_categories = ['Non Par', 'PAR', 'Term'] %}
-                    {% for row in result.below_table %}
-                    <tr>
-                        <td>{{ recommended_categories[loop.index0] if loop.index0 < (recommended_categories|length) else '' }}</td>
-                        {% for cell in row %}
-                        <td>{{ cell }}</td>
+            <div class="table-scroll" aria-label="Recommended Products table">
+                <table class="recommended-products-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Ratio</th>
+                            <th>Recommended Product</th>
+                            <th>Recommended Premium</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set recommended_categories = ['Non Par', 'PAR', 'Term'] %}
+                        {% for row in result.below_table %}
+                        <tr>
+                            <td>{{ recommended_categories[loop.index0] if loop.index0 < (recommended_categories|length) else '' }}</td>
+                            {% for cell in row %}
+                            <td>
+                                {% if loop.index == 3 %}
+                                <span class="excel-cell">{{ cell }}</span>
+                                {% else %}
+                                {{ cell }}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
                         {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="performance-section" style="margin-top: 40px;">
                 <h3 style="font-size: 18px; margin-bottom: 20px; color: #333; font-weight: 600;">Performance on other Parameters</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="performance-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                     {% for param in result.performance_params %}
                     <div class="result-group">
                         <label>{{ param.label }}</label>
-                        <div class="value">{{ param.value }}</div>
+                        <div class="value excel-value">{{ param.value }}</div>
                     </div>
                     {% endfor %}
                 </div>
@@ -516,88 +1042,101 @@
         </div>
 
         <div class="card product-mix-section" id="individual-product-mix">
-            <h2>Individual Product Mix</h2>
+            <h2>Individual product incentive earning basis current binder target achievement</h2>
 
-            <form method="POST">
+            <form method="POST" id="individualMixForm">
                 <input type="hidden" name="emp_id" value="{{ request.form.emp_id or '' }}">
+                <input type="hidden" name="doj" value="{{ request.form.doj or '' }}">
                 <input type="hidden" name="desired_earning" value="{{ request.form.desired_earning or '' }}">
                 <input type="hidden" name="non_par" value="{{ request.form.non_par or '' }}">
                 <input type="hidden" name="par" value="{{ request.form.par or '' }}">
                 <input type="hidden" name="term" value="{{ request.form.term or '' }}">
                 <input type="hidden" name="row_count" id="row_count" value="{{ result.individual_product_row_count or 1 }}">
 
-                <table class="binder-achievement-table individual-product-table">
-                    <thead>
-                        <tr>
-                            {% for header in result.individual_product_headers %}
-                            <th>{{ header }}</th>
+                {% set header_rename = {
+                    'Incentive Earned per Product': 'Estimated incentive for selected product',
+                    'Incentive Earned per Product Cumulative': 'Estimated total incentive (Current incentive + total selected products)'
+                } %}
+
+                <div class="table-wrapper">
+                    <table class="binder-achievement-table individual-product-table">
+                        <thead>
+                            <tr>
+                                {% for header in result.individual_product_headers %}
+                                <th>{{ header_rename.get(header, header) }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in result.individual_product_rows %}
+                            {% set i = loop.index %}
+                            <tr>
+                                <td>{{ i }}</td>
+                                <td>
+                                    <select name="product_{{ i }}" class="table-select product-select" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="HDFC Life Click 2 Achieve" {% if row.product == 'HDFC Life Click 2 Achieve' %}selected{% endif %}>HDFC Life Click 2 Achieve</option>
+                                        <option value="HDFC Life Sanchay Plus" {% if row.product == 'HDFC Life Sanchay Plus' %}selected{% endif %}>HDFC Life Sanchay Plus</option>
+                                        <option value="HDFC Life Guaranteed Income" {% if row.product == 'HDFC Life Guaranteed Income' %}selected{% endif %}>HDFC Life Guaranteed Income</option>
+                                        <option value="Sanchay Fixed Maturity Pln(SL)" {% if row.product == 'Sanchay Fixed Maturity Pln(SL)' %}selected{% endif %}>Sanchay Fixed Maturity Pln(SL)</option>
+                                        <option value="HDFC Guaranteed Savings Plan" {% if row.product == 'HDFC Guaranteed Savings Plan' %}selected{% endif %}>HDFC Guaranteed Savings Plan</option>
+                                        <option value="HDFC Life GWP_FU" {% if row.product == 'HDFC Life GWP_FU' %}selected{% endif %}>HDFC Life GWP_FU</option>
+                                        <option value="HDFC Guaranteed Pension Plan" {% if row.product == 'HDFC Guaranteed Pension Plan' %}selected{% endif %}>HDFC Guaranteed Pension Plan</option>
+                                        <option value="Click to Achieve Par Advantage" {% if row.product == 'Click to Achieve Par Advantage' %}selected{% endif %}>Click to Achieve Par Advantage</option>
+                                        <option value="HDFCLife Sanchay Par Advantage" {% if row.product == 'HDFCLife Sanchay Par Advantage' %}selected{% endif %}>HDFCLife Sanchay Par Advantage</option>
+                                        <option value="HDFC Life Sampoorna Jeevan" {% if row.product == 'HDFC Life Sampoorna Jeevan' %}selected{% endif %}>HDFC Life Sampoorna Jeevan</option>
+                                        <option value="HDFC Life Assured Gain Plus" {% if row.product == 'HDFC Life Assured Gain Plus' %}selected{% endif %}>HDFC Life Assured Gain Plus</option>
+                                        <option value="HDFC Systematic Pension Plan" {% if row.product == 'HDFC Systematic Pension Plan' %}selected{% endif %}>HDFC Systematic Pension Plan</option>
+                                        <option value="HDFC Life Click2Protect Supreme" {% if row.product == 'HDFC Life Click2Protect Supreme' %}selected{% endif %}>HDFC Life Click2Protect Supreme</option>
+                                    </select>
+                                </td>
+                                <td>{% if row.product %}<span class="excel-cell">{{ row.variant }}</span>{% endif %}</td>
+                                <td>
+                                    <select name="rop_variant_yn_{{ i }}" class="table-select yn-select" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="Y" {% if row.rop_variant_yn == 'Y' %}selected{% endif %}>Y</option>
+                                        <option value="N" {% if row.rop_variant_yn == 'N' %}selected{% endif %}>N</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="cashback_yn_{{ i }}" class="table-select yn-select" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="Y" {% if row.cashback_yn == 'Y' %}selected{% endif %}>Y</option>
+                                        <option value="N" {% if row.cashback_yn == 'N' %}selected{% endif %}>N</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="ppt_{{ i }}" class="table-input ppt-input" step="1" min="1" max="30" inputmode="numeric" value="{{ row.ppt or '' }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="pt_{{ i }}" class="table-input pt-input" step="1" min="1" inputmode="numeric" value="{{ row.pt or '' }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="epi_{{ i }}" class="table-input" step="0.01" min="0.01" value="{{ row.epi or '' }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="rider_prem_{{ i }}" class="table-input" step="0.01" min="0.01" value="{{ row.rider_prem or '' }}" required>
+                                </td>
+                                <td><span class="excel-cell">{{ row.incentive_per_product }}</span></td>
+                                <td><span class="excel-cell">{{ row.total_incentive }}</span></td>
+                            </tr>
                             {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in result.individual_product_rows %}
-                        {% set i = loop.index %}
-                        <tr>
-                            <td>{{ i }}</td>
-                            <td>
-                                <select name="product_{{ i }}" class="table-select product-select" required>
-                                    <option value="">-- Select --</option>
-                                    <option value="HDFC Life Click 2 Achieve" {% if row.product == 'HDFC Life Click 2 Achieve' %}selected{% endif %}>HDFC Life Click 2 Achieve</option>
-                                    <option value="HDFC Life Sanchay Plus" {% if row.product == 'HDFC Life Sanchay Plus' %}selected{% endif %}>HDFC Life Sanchay Plus</option>
-                                    <option value="HDFC Life Guaranteed Income" {% if row.product == 'HDFC Life Guaranteed Income' %}selected{% endif %}>HDFC Life Guaranteed Income</option>
-                                    <option value="Sanchay Fixed Maturity Pln(SL)" {% if row.product == 'Sanchay Fixed Maturity Pln(SL)' %}selected{% endif %}>Sanchay Fixed Maturity Pln(SL)</option>
-                                    <option value="HDFC Guaranteed Savings Plan" {% if row.product == 'HDFC Guaranteed Savings Plan' %}selected{% endif %}>HDFC Guaranteed Savings Plan</option>
-                                    <option value="HDFC Life GWP_FU" {% if row.product == 'HDFC Life GWP_FU' %}selected{% endif %}>HDFC Life GWP_FU</option>
-                                    <option value="HDFC Guaranteed Pension Plan" {% if row.product == 'HDFC Guaranteed Pension Plan' %}selected{% endif %}>HDFC Guaranteed Pension Plan</option>
-                                    <option value="Click to Achieve Par Advantage" {% if row.product == 'Click to Achieve Par Advantage' %}selected{% endif %}>Click to Achieve Par Advantage</option>
-                                    <option value="HDFCLife Sanchay Par Advantage" {% if row.product == 'HDFCLife Sanchay Par Advantage' %}selected{% endif %}>HDFCLife Sanchay Par Advantage</option>
-                                    <option value="HDFC Life Sampoorna Jeevan" {% if row.product == 'HDFC Life Sampoorna Jeevan' %}selected{% endif %}>HDFC Life Sampoorna Jeevan</option>
-                                    <option value="HDFC Life Assured Gain Plus" {% if row.product == 'HDFC Life Assured Gain Plus' %}selected{% endif %}>HDFC Life Assured Gain Plus</option>
-                                    <option value="HDFC Systematic Pension Plan" {% if row.product == 'HDFC Systematic Pension Plan' %}selected{% endif %}>HDFC Systematic Pension Plan</option>
-                                    <option value="HDFC Life Click2Protect Supreme" {% if row.product == 'HDFC Life Click2Protect Supreme' %}selected{% endif %}>HDFC Life Click2Protect Supreme</option>
-                                </select>
-                            </td>
-                            <td>{% if row.product %}{{ row.variant }}{% endif %}</td>
-                            <td>
-                                <select name="rop_variant_yn_{{ i }}" class="table-select yn-select" required>
-                                    <option value="">-- Select --</option>
-                                    <option value="Y" {% if row.rop_variant_yn == 'Y' %}selected{% endif %}>Y</option>
-                                    <option value="N" {% if row.rop_variant_yn == 'N' %}selected{% endif %}>N</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="cashback_yn_{{ i }}" class="table-select yn-select" required>
-                                    <option value="">-- Select --</option>
-                                    <option value="Y" {% if row.cashback_yn == 'Y' %}selected{% endif %}>Y</option>
-                                    <option value="N" {% if row.cashback_yn == 'N' %}selected{% endif %}>N</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="number" name="ppt_{{ i }}" class="table-input ppt-input" step="1" min="1" max="30" inputmode="numeric" value="{{ row.ppt or '' }}" required>
-                            </td>
-                            <td>
-                                <input type="number" name="pt_{{ i }}" class="table-input pt-input" step="1" min="1" inputmode="numeric" value="{{ row.pt or '' }}" required>
-                            </td>
-                            <td>
-                                <input type="number" name="epi_{{ i }}" class="table-input" step="0.01" min="0.01" value="{{ row.epi or '' }}" required>
-                            </td>
-                            <td>
-                                <input type="number" name="rider_prem_{{ i }}" class="table-input" step="0.01" min="0.01" value="{{ row.rider_prem or '' }}" required>
-                            </td>
-                            <td>{{ row.incentive_per_product }}</td>
-                            <td>{{ row.total_incentive }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
                 <div id="productRowError" class="product-row-error"></div>
 
                 <div class="table-actions">
-                    {% if (result.individual_product_row_count or 1) < 10 %}
-                    <button type="submit" name="action" value="add_row" id="addMoreBtn" class="add-more-btn">Add more products</button>
-                    {% else %}
-                    <button type="button" id="addMoreBtn" class="add-more-btn" disabled>Add more products</button>
-                    {% endif %}
+                    <div class="left-actions">
+                        {% if (result.individual_product_row_count or 1) < 10 %}
+                        <button type="submit" name="action" value="add_row" id="addMoreBtn" class="add-more-btn">Add more products</button>
+                        {% else %}
+                        <button type="button" id="addMoreBtn" class="add-more-btn" disabled>Add more products</button>
+                        {% endif %}
+                    </div>
+                    <div class="right-actions">
+                        <button type="submit" name="action" value="calculate_products" id="calcProductsBtn" class="calc-products-btn">Calculate</button>
+                    </div>
                 </div>
 
                 <p class="footnote">
@@ -613,13 +1152,53 @@
     
     <script>
         const MAINTENANCE_MODE = {{ 'true' if maintenance_message else 'false' }};
+        const overlay = document.getElementById('loadingOverlay');
+
+        function showLoadingOverlay() {
+            if (!overlay) return;
+            overlay.style.display = 'flex';
+            overlay.setAttribute('aria-hidden', 'false');
+        }
+
+        function wireLoadingForForm(form, submitBtn) {
+            if (!form) return;
+            form.addEventListener('submit', function (e) {
+                // Perceived performance improvement + prevents double-clicks.
+                showLoadingOverlay();
+                const btn = (e && e.submitter) ? e.submitter : submitBtn;
+                if (btn) {
+                    // IMPORTANT: Disabling a submit button can prevent its name/value
+                    // from being included in the POST. Preserve it via a hidden field.
+                    try {
+                        const name = btn.getAttribute('name');
+                        const value = btn.getAttribute('value') || btn.value;
+                        if (name) {
+                            const hidden = document.createElement('input');
+                            hidden.type = 'hidden';
+                            hidden.name = name;
+                            hidden.value = value || '';
+                            form.appendChild(hidden);
+                        }
+                    } catch (e) {}
+                    btn.disabled = true;
+                    // Keep width stable while changing text.
+                    try { btn.textContent = 'Calculating…'; } catch (e) {}
+                }
+            });
+        }
 
         // After clicking "Add more products" (POST + full page reload),
         // keep the user focused on the Individual Product Mix section.
         (function () {
             const addMoreBtn = document.getElementById('addMoreBtn');
+            const calcProductsBtn = document.getElementById('calcProductsBtn');
             if (addMoreBtn) {
                 addMoreBtn.addEventListener('click', function () {
+                    try { sessionStorage.setItem('scrollTarget', 'individual-product-mix'); } catch (e) {}
+                });
+            }
+            if (calcProductsBtn) {
+                calcProductsBtn.addEventListener('click', function () {
                     try { sessionStorage.setItem('scrollTarget', 'individual-product-mix'); } catch (e) {}
                 });
             }
@@ -702,12 +1281,12 @@
             const ratioValid = total === 100;
             if (ratioValid) {
                 totalElement.className = 'valid';
-                totalElement.style.color = '#28a745';
+                totalElement.style.color = '';
                 if (ratioMixErrorElement) {
                     ratioMixErrorElement.style.display = 'none';
                 }
             } else {
-                totalElement.style.color = '#dc3545';
+                totalElement.style.color = 'var(--danger)';
                 if (ratioMixErrorElement) {
                     ratioMixErrorElement.style.display = 'block';
                 }
@@ -755,6 +1334,11 @@
         // Initialize validation on page load
         validateForm();
 
+        // Wire loading overlay for main calculate form
+        const mainForm = document.getElementById('individualProductForm');
+        const calculateBtn = document.getElementById('calculateBtn');
+        wireLoadingForForm(mainForm, calculateBtn);
+
         // Validate Individual Product Mix rows (disable Add more products)
         function isWholeNumberString(v) {
             if (v === null || v === undefined) return false;
@@ -767,6 +1351,7 @@
 
         function validateIndividualProductMix() {
             const addBtn = document.getElementById('addMoreBtn');
+            const calcBtn = document.getElementById('calcProductsBtn');
             const rowCountEl = document.getElementById('row_count');
             const errEl = document.getElementById('productRowError');
             if (!rowCountEl) return;
@@ -778,6 +1363,7 @@
             if (rowCount >= 10) {
                 // Still allow submit for recalculation? Spec says limit to 10, so disable further add.
                 if (addBtn) addBtn.disabled = true;
+                if (calcBtn) calcBtn.disabled = !valid;
                 if (errEl) {
                     errEl.style.display = 'none';
                     errEl.textContent = '';
@@ -862,6 +1448,7 @@
             }
 
             if (addBtn) addBtn.disabled = !valid;
+            if (calcBtn) calcBtn.disabled = !valid;
             if (errEl) {
                 if (!valid && message) {
                     errEl.textContent = message;
@@ -873,7 +1460,17 @@
             }
         }
 
-        document.addEventListener('input', validateIndividualProductMix);
+        // Optimization: only validate when the user edits the Individual Product Mix table.
+        // NOTE: selects often emit "change" (not "input"), so listen to both.
+        function maybeValidateIndividualProductMix(e) {
+            const t = e && e.target;
+            if (!(t instanceof HTMLElement)) return;
+            if (!t.closest || !t.closest('.individual-product-table')) return;
+            validateIndividualProductMix();
+        }
+
+        document.addEventListener('input', maybeValidateIndividualProductMix);
+        document.addEventListener('change', maybeValidateIndividualProductMix);
         validateIndividualProductMix();
 
         function enforcePptPtOnRow(i, showMessage) {
@@ -944,9 +1541,9 @@
         }, true);
 
         // On submit (Add more products), enforce all rows and block submit if invalid
-        const ipForm = document.getElementById('individualProductForm');
-        if (ipForm) {
-            ipForm.addEventListener('submit', function(e) {
+        const individualMixForm = document.getElementById('individualMixForm');
+        if (individualMixForm) {
+            individualMixForm.addEventListener('submit', function(e) {
                 const rowCountEl = document.getElementById('row_count');
                 const rowCount = rowCountEl ? Math.max(1, Math.min(10, parseInt(rowCountEl.value || '1', 10))) : 1;
                 for (let i = 1; i <= rowCount; i++) {
@@ -958,6 +1555,11 @@
                 }
             });
         }
+
+        // Wire loading overlay for the Individual Product Mix submit (Add more products)
+        // (This form exists only when result is shown.)
+        const addMoreBtn = document.getElementById('addMoreBtn');
+        wireLoadingForForm(individualMixForm, addMoreBtn);
     </script>
 </body>
 </html>

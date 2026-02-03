@@ -1,4 +1,5 @@
-Flask
-gunicorn
-# Excel automation (Windows-only; Render runs on Linux)
-pywin32; platform_system == "Windows"
+Flask>=2.0.0
+pandas>=1.3.0
+openpyxl>=3.0.0
+pyxlsb>=1.0.0
+
