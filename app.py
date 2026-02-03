@@ -28,6 +28,16 @@ except ImportError:
 
 app = Flask(__name__)
 
+# Configure logging for production
+import logging
+if not app.debug:
+    # Set up logging for production (Render)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    app.logger.setLevel(logging.INFO)
+
 EXCEL_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__),
                           "Calculator_test.xlsb"))
 SHEET_NAME = "Output"
@@ -635,8 +645,20 @@ def index():
     capping_value = None
     maintenance_message = get_maintenance_message()
 
+    # Log all requests for debugging
+    try:
+        app.logger.info(f"Request: {request.method} {request.path} - Maintenance mode: {bool(maintenance_message)}")
+        if request.method == "POST":
+            app.logger.info(f"POST data received - emp_id: {request.form.get('emp_id')}, doj: {request.form.get('doj')}")
+    except Exception:
+        pass
+
     # Hard maintenance gate (Excel being updated / app temporarily unavailable)
     if maintenance_message:
+        try:
+            app.logger.warning(f"Maintenance mode active: {maintenance_message}")
+        except Exception:
+            pass
         return render_template(
             "index.html",
             result=None,
@@ -775,6 +797,14 @@ def index():
                     result = None
                     error_message = None
         except Exception as e:
+            # Log the full error for debugging
+            try:
+                app.logger.error(f"Error during calculation: {str(e)}", exc_info=True)
+                app.logger.error(f"Excel file path: {EXCEL_FILE}")
+                app.logger.error(f"Excel file exists: {os.path.exists(EXCEL_FILE)}")
+            except Exception:
+                pass
+            
             # If Excel is unavailable (common during workbook updates), show maintenance message.
             if _should_show_maintenance_for_excel_error(e):
                 try:
@@ -794,6 +824,24 @@ def index():
         maintenance_message=maintenance_message,
         capping_value=capping_value,
     )
+
+
+# Health check endpoint for Render
+@app.route("/health", methods=["GET"])
+def health():
+    """Health check endpoint for monitoring"""
+    try:
+        excel_exists = os.path.exists(EXCEL_FILE)
+        maintenance = get_maintenance_message()
+        return {
+            "status": "ok" if excel_exists and not maintenance else "degraded",
+            "excel_file_exists": excel_exists,
+            "excel_file_path": EXCEL_FILE,
+            "maintenance_mode": bool(maintenance),
+            "maintenance_message": maintenance
+        }, 200
+    except Exception as e:
+        return {"status": "error", "error": str(e)}, 500
 
 
 if __name__ == "__main__":
